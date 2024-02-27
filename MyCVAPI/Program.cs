@@ -20,21 +20,35 @@ namespace MyCVAPI
 
 			app.UseAuthorization();
 
-			app.MapGet("/api/skills", async () =>
+            app.MapGet("/api/skills", async () =>
 			{
 				var skills = await db.GetAllData<Skill>("Skills");
 
 				return Results.Ok(skills);
 			});
 
-			app.MapPost("/api/skill", async (Skill skill) =>
+            app.MapGet("/api/admins", async () =>
+            {
+                var admins = await db.GetAllData<Admin>("Admins");
+
+                return Results.Ok(admins);
+            });
+
+            app.MapPost("/api/skill", async (Skill skill) =>
 			{
 				await db.AddData("Skills", skill);
 
 				return Results.Ok($"{skill.Name} was added");
 			});
 
-			app.Run();
+            app.MapPost("/api/admin", async (Admin admin) =>
+            {
+                await db.AddData("Admins", admin);
+
+                return Results.Ok($"{admin.Name} was added");
+            });
+
+            app.Run();
 		}
 	}
 }

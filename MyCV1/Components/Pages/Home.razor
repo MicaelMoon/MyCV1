@@ -52,7 +52,7 @@
 </div>
 <AuthorizeView>
 	<div>
-		<h3>AddSkill</h3>
+		<h3>Add Skill</h3>
 		<label for="titleInput">Title</label>
 		<input id="titleInput" @bind="title" @bind:event="oninput" />
 		<label for="descriptionInput">Description</label>
@@ -60,6 +60,12 @@
 		<label for="timeInput">Time</label>
 		<input id="timeInput" @bind="time" @bind:event="oninput" />
 		<button class="btn btn-primary" @onclick="SubmitBtn">Submit</button>
+	</div>	
+	<div>
+		<h3>Add Admin</h3>
+		<label for="titleInput">Email</label>
+		<input id="titleInput" @bind="email" @bind:event="oninput" />
+		<button class="btn btn-primary" @onclick="SubmitAdmin">Submit</button>
 	</div>
 </AuthorizeView>
 
@@ -68,6 +74,8 @@
 	private string title;
 	private string description;
 	private string time;
+
+	private string email;
 
 	private List<Skill> skills = new List<Skill>();
 
@@ -82,7 +90,6 @@
 			if (responseSkills.IsSuccessStatusCode)
 			{
 				skills = await responseSkills.Content.ReadFromJsonAsync<List<Skill>>();
-
 			}
 			else
 			{
@@ -105,5 +112,17 @@
 		using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
 		await http.PostAsync("https://localhost:7237/api/skill", content);
+	}
+
+	private async Task SubmitAdmin()
+	{
+		var newAdmin = new Admin { Name = email};
+
+		HttpClient http = HttpClientFactory.CreateClient();
+
+		var json = JsonSerializer.Serialize(newAdmin);
+		using var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+		await http.PostAsync("https://localhost:7237/api/admin", content);
 	}
 }

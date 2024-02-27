@@ -1,74 +1,125 @@
-﻿@implements IDisposable
+﻿@using Common.Models
+@implements IDisposable
+@inject IHttpClientFactory HttpClientFactory
+@rendermode InteractiveServer
 
 @inject NavigationManager NavigationManager
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">MyCV1</a>
+		<AuthorizeView>
+			@foreach (Admin admin in admins)
+			{
+				if (context.User.Identity?.Name == admin.Name)
+				{
+					<div class="nav-item px-3">
+						<button class="btn @(isToggled ? "btn-success" : "btn-danger")" @onclick="ToggleAdminView">Admin view</button>
+					</div>  
+					break;
+				}
+			}
+		</AuthorizeView>
+
+
+@if (isToggled)
+{
+	<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+    <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="auth">
+                    <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
+                </NavLink>
+            </div>
+
+            <AuthorizeView>
+                <Authorized>
+                    @foreach (Admin admin in admins)
+                    {
+                        if (context.User.Identity?.Name == admin.Name)
+                        {
+                            <div class="nav-item px-3">
+                                <NavLink class="nav-link" href="AddNewSkill">
+                                    <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Add skill
+                                </NavLink>
+                            </div>
+                            break;
+                        }
+                    }
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="Account/Manage">
+                            <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Account
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-3">
+                        <form action="Account/Logout" method="post">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                            <button type="submit" class="nav-link">
+                                <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                            </button>
+                        </form>
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="Account/Register">
+                            <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-3">
+                        <NavLink class="nav-link" href="Account/Login">
+                            <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
+                        </NavLink>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+        </nav>
     </div>
-</div>
+}
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="auth">
-                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
-            </NavLink>
-        </div>
-
-        <AuthorizeView>
-	        <Authorized>
-		        <div class="nav-item px-3">
-			        <NavLink class="nav-link" href="Account/Manage">
-				        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Add skill
-			        </NavLink>
-		        </div>
-		        <div class="nav-item px-3">
-			        <NavLink class="nav-link" href="Account/Manage">
-				        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
-			        </NavLink>
-		        </div>
-		        <div class="nav-item px-3">
-			        <form action="Account/Logout" method="post">
-				        <AntiforgeryToken/>
-				        <input type="hidden" name="ReturnUrl" value="@currentUrl"/>
-				        <button type="submit" class="nav-link">
-					        <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-				        </button>
-			        </form>
-		        </div>
-	        </Authorized>
-            <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Register">
-                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Login">
-                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
-                    </NavLink>
-                </div>
-            </NotAuthorized>
-        </AuthorizeView>
-    </nav>
-</div>
 
 @code {
+	private bool isToggled = false;
     private string? currentUrl;
+    private List<Admin> admins = new List<Admin>();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
+
+        HttpClient http = HttpClientFactory.CreateClient();
+
+        try
+        {
+
+            var responseAdmins = await http.GetAsync("https://localhost:7237/api/admins");
+
+	        if (responseAdmins.IsSuccessStatusCode)
+	        {
+		        admins = await responseAdmins.Content.ReadFromJsonAsync<List<Admin>>();
+
+	        }
+	        else
+	        {
+		        string errorMessage = $"Error: {responseAdmins.StatusCode}";
+	        }
+        }
+        catch (Exception e)
+        {
+	        Console.WriteLine(e);
+        }
+    }
+
+    private void ToggleAdminView()
+    {
+	    isToggled = isToggled ? isToggled = false : isToggled = true;
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
