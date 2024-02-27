@@ -1,0 +1,6 @@
+@MyCVAPI_HostAddress = http://localhost:5030
+
+GET {{MyCVAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

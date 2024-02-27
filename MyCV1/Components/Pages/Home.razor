@@ -1,0 +1,109 @@
+﻿@page "/"
+@using Common.Models
+@using System.Text.Json
+@using System.Text
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Index</PageTitle>
+
+<div>
+	<h1>Micael Sjödin</h1>
+	<h5>.NET CLOUD DEVELOPER</h5>
+</div>
+<div>
+	<h3>Current occupation</h3>
+	<h5>Studying</h5>
+	<h6>.Net Cloud Developer | IT-högskolan</h6>
+	<h7>Learning the hole cycle of creating applitaions using primary the tools within .NET, <br /> from coding all the way to publishing</h7>
+</div>
+<div>
+	<h3>Work experience</h3>
+	<div>
+		<h5>Kitchen Porter</h5>
+		<h6>Grand Curiosa hotell | Mars 2023 - present</h6>
+		<ul>
+			<li>Responsebility for delivery, dishes, kitchen cleaning <br />amomg with being open to help staff <br />with all kinds of tasks across the hotel when needed</li>
+		</ul>
+	</div>
+</div>
+
+<div>
+	<h3>Educations</h3>
+	<h5>Göteborgs Folkhögskola</h5>
+	<h6>Fundamental High school competence | Aug 2021 - June 2022</h6>
+	<h5>Hermods</h5>
+	<h6>Programming 1 | June 2022 - Sep 2022</h6>
+</div>
+
+<div>
+	<h3>Skills</h3>
+	<ui>
+		<hr />
+		@foreach (Skill skill in skills)
+		{
+			<h5>@skill.Name <br /></h5>
+			<h6>Description: @skill.Description <br /></h6>
+			<h6>Years: @skill.Time<br /></h6>
+			<hr />
+		}
+	</ui>
+</div>
+<AuthorizeView>
+	<div>
+		<h3>AddSkill</h3>
+		<label for="titleInput">Title</label>
+		<input id="titleInput" @bind="title" @bind:event="oninput" />
+		<label for="descriptionInput">Description</label>
+		<input id="descriptionInput" @bind="description" @bind:event="oninput" />
+		<label for="timeInput">Time</label>
+		<input id="timeInput" @bind="time" @bind:event="oninput" />
+		<button class="btn btn-primary" @onclick="SubmitBtn">Submit</button>
+	</div>
+</AuthorizeView>
+
+
+@code {
+	private string title;
+	private string description;
+	private string time;
+
+	private List<Skill> skills = new List<Skill>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		HttpClient http = HttpClientFactory.CreateClient();
+
+		try
+		{
+			var responseSkills = await http.GetAsync("https://localhost:7237/api/skills");
+
+			if (responseSkills.IsSuccessStatusCode)
+			{
+				skills = await responseSkills.Content.ReadFromJsonAsync<List<Skill>>();
+
+			}
+			else
+			{
+				string errorMessage = $"Error: {responseSkills.StatusCode}";
+			}
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+		}
+	}
+
+	private async Task SubmitBtn()
+	{
+		var newSkill = new Skill { Name = title, Description = description, Time = time };
+
+		HttpClient http = HttpClientFactory.CreateClient();
+
+		var json = JsonSerializer.Serialize(newSkill);
+		using var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+		await http.PostAsync("https://localhost:7237/api/skill", content);
+	}
+}
