@@ -9,6 +9,21 @@
 <PageTitle>Index</PageTitle>
 
 <div>
+	<AuthorizeView>
+		@foreach (Admin admin in admins)
+		{
+			if (context.User.Identity?.Name == admin.Name)
+			{
+				<div>
+					<button class="btn @(ToggleNavMenu ? "btn-success" : "btn-danger")" @onclick="ToggleAdminView">Admin view</button>
+				</div>  
+				break;
+			}
+		}
+	</AuthorizeView>
+</div>
+
+<div>
 	<h1>Micael Sjödin</h1>
 	<h5>.NET CLOUD DEVELOPER</h5>
 </div>
@@ -61,12 +76,6 @@
 		<input id="timeInput" @bind="time" @bind:event="oninput" />
 		<button class="btn btn-primary" @onclick="SubmitBtn">Submit</button>
 	</div>	
-	<div>
-		<h3>Add Admin</h3>
-		<label for="titleInput">Email</label>
-		<input id="titleInput" @bind="email" @bind:event="oninput" />
-		<button class="btn btn-primary" @onclick="SubmitAdmin">Submit</button>
-	</div>
 </AuthorizeView>
 
 
@@ -75,9 +84,10 @@
 	private string description;
 	private string time;
 
-	private string email;
+	private bool ToggleNavMenu = false;
 
 	private List<Skill> skills = new List<Skill>();
+	private List<Admin> admins = new List<Admin>();
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -100,6 +110,26 @@
 		{
 			Console.WriteLine(e);
 		}
+
+		try
+		{
+
+			var responseAdmins = await http.GetAsync("https://localhost:7237/api/admins");
+
+			if (responseAdmins.IsSuccessStatusCode)
+			{
+				admins = await responseAdmins.Content.ReadFromJsonAsync<List<Admin>>();
+
+			}
+			else
+			{
+				string errorMessage = $"Error: {responseAdmins.StatusCode}";
+			}
+		}
+		catch (Exception e)
+		{
+			Console.WriteLine(e);
+		}
 	}
 
 	private async Task SubmitBtn()
@@ -114,15 +144,8 @@
 		await http.PostAsync("https://localhost:7237/api/skill", content);
 	}
 
-	private async Task SubmitAdmin()
+	private void ToggleAdminView()
 	{
-		var newAdmin = new Admin { Name = email};
-
-		HttpClient http = HttpClientFactory.CreateClient();
-
-		var json = JsonSerializer.Serialize(newAdmin);
-		using var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-		await http.PostAsync("https://localhost:7237/api/admin", content);
+		ToggleNavMenu = !ToggleNavMenu;
 	}
 }
