@@ -9,26 +9,25 @@
 
 <PageTitle>Index</PageTitle>
 
-<div class="container">
-	<AuthorizeView>
-		<div class="sticky-top">
-			@foreach (Admin admin in admins)
+		
+<AuthorizeView>
+	<div class="sticky-top">
+		@foreach (Admin admin in admins)
+		{
+			if (context.User.Identity?.Name == admin.Name)
 			{
-				if (context.User.Identity?.Name == admin.Name)
-				{
-					<button class="btn @(ToggleNavMenu ? "btn-success" : "btn-danger")" @onclick="ToggleAdminView">Admin view</button>
-					break;
-				}
+				<button class="btn @(ToggleNavMenu ? "btn-success" : "btn-danger")" @onclick="ToggleAdminView">Admin view</button>
+				break;
 			}
-			@if (ToggleNavMenu)
-			{
-				<a href="Account/Manage">Account</a>
-				<a href="AddNewSkill">Add skill</a>
-				<a href="auth">Auth Required</a>
-			}
-		</div>
-	</AuthorizeView>
-</div>
+		}
+		@if (ToggleNavMenu)
+		{
+			<a href="Account/Manage">Account</a>
+			<a href="AddNewSkill">Add skill</a>
+			<a href="auth">Auth Required</a>
+		}
+	</div>
+</AuthorizeView>
 
 <div>
 	<h1>Micael Sjödin</h1>
@@ -120,7 +119,6 @@
 
 		try
 		{
-
 			var responseAdmins = await http.GetAsync("https://localhost:7237/api/admins");
 
 			if (responseAdmins.IsSuccessStatusCode)
