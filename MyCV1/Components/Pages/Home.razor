@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using Common.Models
+@using MyCV1.Components.Layout
 @using System.Text.Json
 @using System.Text
 @inject IHttpClientFactory HttpClientFactory
@@ -8,18 +9,24 @@
 
 <PageTitle>Index</PageTitle>
 
-<div>
+<div class="container">
 	<AuthorizeView>
-		@foreach (Admin admin in admins)
-		{
-			if (context.User.Identity?.Name == admin.Name)
+		<div class="sticky-top">
+			@foreach (Admin admin in admins)
 			{
-				<div>
+				if (context.User.Identity?.Name == admin.Name)
+				{
 					<button class="btn @(ToggleNavMenu ? "btn-success" : "btn-danger")" @onclick="ToggleAdminView">Admin view</button>
-				</div>  
-				break;
+					break;
+				}
 			}
-		}
+			@if (ToggleNavMenu)
+			{
+				<a href="Account/Manage">Account</a>
+				<a href="AddNewSkill">Add skill</a>
+				<a href="auth">Auth Required</a>
+			}
+		</div>
 	</AuthorizeView>
 </div>
 

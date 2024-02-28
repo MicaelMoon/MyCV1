@@ -1,18 +1,13 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page">
-    
-	@if (ToggleNavMenu)
-	{
-		<div class="sidebar">
-			<NavMenu />
-		</div>
-	}
-	<CascadingValue Value="ToggleNavMenu">
+	<main>
+		
+
 		<article class="content px-4">
 			@Body
 		</article>
-	</CascadingValue>
+	</main>
 
 </div>
 
@@ -23,9 +18,7 @@
 </div>
 
 @code{
-
-	[Parameter]
-    public bool ToggleNavMenu { get; set; } = false;
+    private bool ToggleNavMenu { get; set; } = false;
 
 }
 
