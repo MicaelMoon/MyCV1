@@ -20,6 +20,7 @@ namespace MyCVAPI
 
 			app.UseAuthorization();
 
+			//Read
             app.MapGet("/api/skills", async () =>
 			{
 				var skills = await db.GetAllData<Skill>("Skills");
@@ -34,7 +35,16 @@ namespace MyCVAPI
                 return Results.Ok(admins);
             });
 
-            app.MapPost("/api/skill", async (Skill skill) =>
+            app.MapGet("/api/projects", async () =>
+            {
+	            var project = await db.GetAllData<Project>("Projects");
+
+	            return Results.Ok(project);
+            });
+
+			//Create
+
+			app.MapPost("/api/skill", async (Skill skill) =>
 			{
 				await db.AddData("Skills", skill);
 
@@ -48,7 +58,14 @@ namespace MyCVAPI
                 return Results.Ok($"{admin.Name} was added");
             });
 
-            app.Run();
+            app.MapPost("/api/project", async (Project project) =>
+            {
+	            await db.AddData("Projects", project);
+
+	            return Results.Ok($"{project.Name} was added");
+            });
+
+			app.Run();
 		}
 	}
 }

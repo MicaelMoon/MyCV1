@@ -9,6 +9,7 @@
 
 <PageTitle>Index</PageTitle>
 
+
 		
 <AuthorizeView>
 	<div class="sticky-top">
@@ -16,6 +17,7 @@
 		{
 			if (context.User.Identity?.Name == admin.Name)
 			{
+				registeredAdmin = admin;
 				<button class="btn @(ToggleNavMenu ? "btn-success" : "btn-danger")" @onclick="ToggleAdminView">Admin view</button>
 				break;
 			}
@@ -30,17 +32,17 @@
 </AuthorizeView>
 
 <div>
-	<h1>Micael Sjödin</h1>
-	<h5>.NET CLOUD DEVELOPER</h5>
+	<h1 id="CVName">Micael Sjödin</h1>
+	<h5 id="CVTitle">.NET CLOUD DEVELOPER</h5>
 </div>
 <div>
-	<h3>Current occupation</h3>
-	<h5>Studying</h5>
-	<h6>.Net Cloud Developer | IT-högskolan</h6>
-	<h7>Learning the hole cycle of creating applitaions using primary the tools within .NET, <br /> from coding all the way to publishing</h7>
+	<h3 id="CVOccupationLabel">Current occupation</h3>
+	<h5 id="CVOccupationText">Studying</h5>
+	<h6 id="CVOccupationTitle">.Net Cloud Developer | IT-högskolan</h6>
+	<h7 id="CVOccupationDescription">Learning the hole cycle of creating applitaions using primary the tools within .NET, <br /> from coding all the way to publishing</h7>
 </div>
 <div>
-	<h3>Work experience</h3>
+	<h3 id="CVWorkExperienceLabel">Work experience</h3>
 	<div>
 		<h5>Kitchen Porter</h5>
 		<h6>Grand Curiosa hotell | Mars 2023 - present</h6>
@@ -67,21 +69,52 @@
 			<h5>@skill.Name <br /></h5>
 			<h6>Description: @skill.Description <br /></h6>
 			<h6>Years: @skill.Time<br /></h6>
+			<h6>Experience level: @skill.ExperienceLevel<br /></h6>
 			<hr />
 		}
 	</ui>
 </div>
+<div>
+	<h3>Projects</h3>
+	<ui>
+		<hr/>
+		@foreach (Project project in projects)
+		{
+			<h5>@project.Name <br/></h5>
+			<h6>@project.Description</h6>
+			<hr/>
+		}
+	</ui>
+</div>
+<div>
+	<a href="https://www.linkedin.com/in/micael-sj%C3%B6din-240aba289/">Linkedin</a>
+	<a href="https://github.com/MicaelMoon">Github</a>
+</div>
 <AuthorizeView>
-	<div>
-		<h3>Add Skill</h3>
-		<label for="titleInput">Title</label>
-		<input id="titleInput" @bind="title" @bind:event="oninput" />
-		<label for="descriptionInput">Description</label>
-		<input id="descriptionInput" @bind="description" @bind:event="oninput" />
-		<label for="timeInput">Time</label>
-		<input id="timeInput" @bind="time" @bind:event="oninput" />
-		<button class="btn btn-primary" @onclick="SubmitBtn">Submit</button>
-	</div>	
+	@if (registeredAdmin != null)
+	{
+		<div>
+			<h3>Add Skill</h3>
+			<label for="titleInput">Title</label>
+			<input id="titleInput" @bind="title" @bind:event="oninput"/>
+			<label for="descriptionInput">Description</label>
+			<input id="descriptionInput" @bind="description" @bind:event="oninput"/>
+			<label for="timeInput">Time</label>
+			<input id="timeInput" @bind="time" @bind:event="oninput"/>
+			<button class="btn btn-primary" @onclick="SubmitBtn">Submit</button>
+		</div>
+		<EditForm></EditForm>
+		<hr/>
+		<div>
+			@foreach (Skill skill in skills)
+			{
+				<div>
+					<label>@skill.Name</label>
+					<button>Delete</button>
+				</div>
+			}
+		</div>
+	}
 </AuthorizeView>
 
 
@@ -90,10 +123,13 @@
 	private string description;
 	private string time;
 
+	private Admin registeredAdmin;
+
 	private bool ToggleNavMenu = false;
 
 	private List<Skill> skills = new List<Skill>();
 	private List<Admin> admins = new List<Admin>();
+	private List<Project> projects = new List<Project>();
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -102,6 +138,8 @@
 		try
 		{
 			var responseSkills = await http.GetAsync("https://localhost:7237/api/skills");
+			var responseAdmins = await http.GetAsync("https://localhost:7237/api/admins");
+			var responseProjects = await http.GetAsync("https://localhost:7237/api/projects");
 
 			if (responseSkills.IsSuccessStatusCode)
 			{
@@ -111,15 +149,6 @@
 			{
 				string errorMessage = $"Error: {responseSkills.StatusCode}";
 			}
-		}
-		catch (Exception e)
-		{
-			Console.WriteLine(e);
-		}
-
-		try
-		{
-			var responseAdmins = await http.GetAsync("https://localhost:7237/api/admins");
 
 			if (responseAdmins.IsSuccessStatusCode)
 			{
@@ -129,6 +158,16 @@
 			else
 			{
 				string errorMessage = $"Error: {responseAdmins.StatusCode}";
+			}
+
+			if (responseProjects.IsSuccessStatusCode)
+			{
+				 projects= await responseProjects.Content.ReadFromJsonAsync<List<Project>>();
+
+			}
+			else
+			{
+				string errorMessage = $"Error: {responseProjects.StatusCode}";
 			}
 		}
 		catch (Exception e)
