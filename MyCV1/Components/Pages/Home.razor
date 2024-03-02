@@ -9,7 +9,16 @@
 
 <PageTitle>Index</PageTitle>
 
+<style>
+	.container {
+		display: flex;
+	}
 
+	.column {
+		flex: 1;
+		padding: 10px;
+	}
+</style>
 		
 <AuthorizeView>
 	<div class="sticky-top">
@@ -30,6 +39,14 @@
 		}
 	</div>
 </AuthorizeView>
+<div class="container">
+	<div class="column">
+		YOOOOOOOOOOOOOOOOOOOOOOO
+	</div>
+	<div class="column">
+		TOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+	</div>
+</div>
 
 <div>
 	<h1 id="CVName">Micael Sjödin</h1>
@@ -87,38 +104,54 @@
 	</ui>
 </div>
 <div>
-	<a href="https://www.linkedin.com/in/micael-sj%C3%B6din-240aba289/">Linkedin</a>
-	<a href="https://github.com/MicaelMoon">Github</a>
+	<a href="https://www.linkedin.com/in/micael-sj%C3%B6din-240aba289/" target="_blank">Linkedin</a>
+	<a href="https://github.com/MicaelMoon" target="_blank">Github</a>
 </div>
 <AuthorizeView>
-	@if (registeredAdmin != null)
-	{
-		<div>
-			<h3>Add Skill</h3>
-			<label for="titleInput">Title</label>
-			<input id="titleInput" @bind="title" @bind:event="oninput"/>
-			<label for="descriptionInput">Description</label>
-			<input id="descriptionInput" @bind="description" @bind:event="oninput"/>
-			<label for="timeInput">Time</label>
-			<input id="timeInput" @bind="time" @bind:event="oninput"/>
-			<button class="btn btn-primary" @onclick="SubmitBtn">Submit</button>
-		</div>
-		<EditForm></EditForm>
-		<hr/>
-		<div>
-			@foreach (Skill skill in skills)
-			{
+	<Authorized>
+		@if (registeredAdmin != null)
+		{
+			<div>
+				<h3>Add Skill</h3>
+				<label for="titleInput">Title</label>
+				<input id="titleInput" @bind="title" @bind:event="oninput"/>
+				<label for="descriptionInput">Description</label>
+				<input id="descriptionInput" @bind="description" @bind:event="oninput"/>
+				<label for="timeInput">Time</label>
+				<input id="timeInput" @bind="time" @bind:event="oninput"/>
+				<button class="btn btn-primary" @onclick="SubmitBtn">Submit</button>
+			</div>
+			<!--			<EditForm Model="@newSkill">
 				<div>
-					<label>@skill.Name</label>
-					<button>Delete</button>
+					<label for="newSkillName">Title</label>
+					<InputText id="newSkillName" @bind-Value="newSkill.Name"></InputText>
+					<label for="newSkillDescription">Title</label>
+					<InputText id="newSkillDescription" @bind-Value="newSkill.Description"></InputText>
+					<label for="newSkillTime">Title</label>
+					<InputText id="newSkillTime" @bind-Value="newSkill.Time"></InputText>
+					<button class="btn btn-primary" @onclick="AddNewSkill"></button>
 				</div>
-			}
-		</div>
-	}
+			</EditForm>
+			-->
+
+			<hr/>
+			<div>
+				@foreach (Skill skill in skills)
+				{
+					<div>
+						<label>@skill.Name</label>
+						<button>Delete</button>
+					</div>
+				}
+			</div>
+		}
+	</Authorized>
 </AuthorizeView>
 
 
 @code {
+	private Skill newSkill = new Skill();
+
 	private string title;
 	private string description;
 	private string time;
@@ -186,6 +219,11 @@
 		using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
 		await http.PostAsync("https://localhost:7237/api/skill", content);
+	}
+
+	private async Task AddNewSkill()
+	{
+
 	}
 
 	private void ToggleAdminView()
