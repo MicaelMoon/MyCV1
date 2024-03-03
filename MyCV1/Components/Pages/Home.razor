@@ -3,9 +3,13 @@
 @using MyCV1.Components.Layout
 @using System.Text.Json
 @using System.Text
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Components.Authorization
 @inject IHttpClientFactory HttpClientFactory
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
+@inject AuthenticationStateProvider AuthenticationStateProvider
+<link href="app.css"/>
 
 <PageTitle>Index</PageTitle>
 
@@ -18,95 +22,105 @@
 		flex: 1;
 		padding: 10px;
 	}
+	
+	#Image {
+		width:230px;
+		height:330px;
+	}
 </style>
 		
 <AuthorizeView>
-	<div class="sticky-top">
-		@foreach (Admin admin in admins)
-		{
-			if (context.User.Identity?.Name == admin.Name)
-			{
-				registeredAdmin = admin;
-				<button class="btn @(ToggleNavMenu ? "btn-success" : "btn-danger")" @onclick="ToggleAdminView">Admin view</button>
-				break;
-			}
-		}
-		@if (ToggleNavMenu)
-		{
-			<a href="Account/Manage">Account</a>
-			<a href="AddNewSkill">Add skill</a>
-			<a href="auth">Auth Required</a>
-		}
-	</div>
+	<Authorized>
+		<a href="Account/Manage">Account</a>
+		<form method="post" action="Account/Logout">
+			<AntiforgeryToken />
+			<input type="hidden" name="ReturnUrl"/>
+			<button type="submit">
+				<span aria-hidden="true"></span> Logout
+			</button>
+		</form>
+	</Authorized>
+	<NotAuthorized>
+		<a href="Account/Login">Log in</a>
+		<a href="Account/Manage">Register</a>
+	</NotAuthorized>
 </AuthorizeView>
+
+
 <div class="container">
-	<div class="column">
-		YOOOOOOOOOOOOOOOOOOOOOOO
-	</div>
-	<div class="column">
-		TOOOOOOOOOOOOOOOOOOOOOOOOOOOO
-	</div>
-</div>
-
-<div>
-	<h1 id="CVName">Micael Sjödin</h1>
-	<h5 id="CVTitle">.NET CLOUD DEVELOPER</h5>
-</div>
-<div>
-	<h3 id="CVOccupationLabel">Current occupation</h3>
-	<h5 id="CVOccupationText">Studying</h5>
-	<h6 id="CVOccupationTitle">.Net Cloud Developer | IT-högskolan</h6>
-	<h7 id="CVOccupationDescription">Learning the hole cycle of creating applitaions using primary the tools within .NET, <br /> from coding all the way to publishing</h7>
-</div>
-<div>
-	<h3 id="CVWorkExperienceLabel">Work experience</h3>
-	<div>
-		<h5>Kitchen Porter</h5>
-		<h6>Grand Curiosa hotell | Mars 2023 - present</h6>
-		<ul>
-			<li>Responsebility for delivery, dishes, kitchen cleaning <br />amomg with being open to help staff <br />with all kinds of tasks across the hotel when needed</li>
-		</ul>
-	</div>
-</div>
-
-<div>
-	<h3>Educations</h3>
-	<h5>Göteborgs Folkhögskola</h5>
-	<h6>Fundamental High school competence | Aug 2021 - June 2022</h6>
-	<h5>Hermods</h5>
-	<h6>Programming 1 | June 2022 - Sep 2022</h6>
-</div>
-
-<div>
-	<h3>Skills</h3>
-	<ui>
-		<hr />
-		@foreach (Skill skill in skills)
-		{
-			<h5>@skill.Name <br /></h5>
-			<h6>Description: @skill.Description <br /></h6>
-			<h6>Years: @skill.Time<br /></h6>
-			<h6>Experience level: @skill.ExperienceLevel<br /></h6>
-			<hr />
-		}
-	</ui>
-</div>
-<div>
-	<h3>Projects</h3>
-	<ui>
+	<div class="column left">	<!--Left Column-->
+		<img id="Image" src="Micael5.jpg" alt="Profile picture"/>
 		<hr/>
-		@foreach (Project project in projects)
-		{
-			<h5>@project.Name <br/></h5>
-			<h6>@project.Description</h6>
+		<h3>Skills</h3>
+		<ui>
+			<br/>
+			@foreach (Skill skill in skills)
+			{
+				<h5>@skill.Name <br/></h5>
+				<h6>Description: @skill.Description <br/></h6>
+				<h6>Years: @skill.Time<br/></h6>
+				<h6>Experience level: @skill.ExperienceLevel<br/></h6>
+				<br/>
+			}
 			<hr/>
-		}
-	</ui>
+			<h3>Languages</h3>
+			<ul>
+				<li>Swedish (fluent)</li>
+				<li>English (Great)</li>
+			</ul>
+		</ui>
+
+		</div>
+		<div class="column right">	<!--Right Column-->
+			<h1 id="CVName">Micael Sjödin</h1>
+			<h5 id="CVTitle">.NET CLOUD DEVELOPER</h5>
+
+			<h3 id="CVWorkExperienceLabel">Work experience</h3>
+			<div>
+				<h5>Kitchen Porter</h5>
+				<h6>Grand Curiosa hotell | Mars 2023 - present</h6>
+				<ul>
+					<li>Responsebility for delivery, dishes, kitchen cleaning <br />amomg with being open to help staff <br />with all kinds of tasks across the hotel when needed</li>
+				</ul>
+			</div>
+
+			<h3 id="CVOccupationLabel">Current occupation</h3>
+			<div>
+				<h5 id="CVOccupationText">Studying</h5>
+				<h6 id="CVOccupationTitle">.Net Cloud Developer | IT-högskolan</h6>
+				<h7 id="CVOccupationDescription">Learning the hole cycle of creating applitaions using primary the tools within .NET, <br /> from coding all the way to publishing</h7>
+				<hr />
+				<h5>Working</h5>
+				<h6>Kitchen Porter | Grand Curiosa</h6>
+			</div>
+			
+			<h3>Educations</h3>
+			<h5>Göteborgs Folkhögskola</h5>
+			<h6>Fundamental High school competence | Aug 2021 - June 2022</h6>
+			<h5>Hermods</h5>
+			<h6>Programming 1 | June 2022 - Sep 2022</h6>
+			
+			<div>
+				<h3>Projects</h3>
+				<ui>
+					<hr/>
+					@foreach (Project project in projects)
+					{
+						<h5>@project.Name <br/></h5>
+						<h6>@project.Description</h6>
+						<hr/>
+					}
+				</ui>
+			</div>
+		</div>
 </div>
+
+
 <div>
 	<a href="https://www.linkedin.com/in/micael-sj%C3%B6din-240aba289/" target="_blank">Linkedin</a>
 	<a href="https://github.com/MicaelMoon" target="_blank">Github</a>
 </div>
+<hr />
 <AuthorizeView>
 	<Authorized>
 		@if (registeredAdmin != null)
@@ -114,12 +128,14 @@
 			<div>
 				<h3>Add Skill</h3>
 				<label for="titleInput">Title</label>
-				<input id="titleInput" @bind="title" @bind:event="oninput"/>
+				<input id="titleInput" @bind="skillTitle" @bind:event="oninput"/>
 				<label for="descriptionInput">Description</label>
-				<input id="descriptionInput" @bind="description" @bind:event="oninput"/>
+				<input id="descriptionInput" @bind="skillDescription" @bind:event="oninput"/>
 				<label for="timeInput">Time</label>
-				<input id="timeInput" @bind="time" @bind:event="oninput"/>
-				<button class="btn btn-primary" @onclick="SubmitBtn">Submit</button>
+				<input id="timeInput" @bind="skillTime" @bind:event="oninput"/>
+				<label for="experienceLevelInput">Level</label>
+				<input id="experienceLevelInput" @bind="skillExperienceLevel" @bind:event="oninput" />
+				<button class="btn btn-primary" @onclick="AddNewSkill">Submit</button>
 			</div>
 			<!--			<EditForm Model="@newSkill">
 				<div>
@@ -133,30 +149,39 @@
 				</div>
 			</EditForm>
 			-->
-
 			<hr/>
 			<div>
-				@foreach (Skill skill in skills)
-				{
-					<div>
-						<label>@skill.Name</label>
-						<button>Delete</button>
-					</div>
-				}
+				<h3>Add Project</h3>
+				<label for="projectTitleLabel">Title</label>
+				<input id="projectTitleInput" @bind="projectTitle" @bind:event="oninput"/>
+				<label for="projectDescriptionLabel">Description</label>
+				<input id="projectDescriptionInput" @bind="projectDescription" @bind:event="oninput" />
+				<label for="projectLinkInput">Link</label>
+				<input id="projectLinkInput" @bind="projectLink" @bind:event="oninput" />
+				<button class="btn btn-primary" @onclick="AddNewProject">Submit</button>
 			</div>
+			<hr />
 		}
 	</Authorized>
 </AuthorizeView>
 
 
 @code {
+
 	private Skill newSkill = new Skill();
 
-	private string title;
-	private string description;
-	private string time;
+	private string skillTitle;
+	private string skillDescription;
+	private string skillTime;
+	private string skillExperienceLevel;
+
+	private string projectTitle;
+	private string projectDescription;
+	private string? projectLink;
 
 	private Admin registeredAdmin;
+	private ClaimsPrincipal user;
+
 
 	private bool ToggleNavMenu = false;
 
@@ -166,10 +191,14 @@
 
 	protected override async Task OnInitializedAsync()
 	{
+
 		HttpClient http = HttpClientFactory.CreateClient();
 
 		try
 		{
+			var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+			user = authState.User;
+
 			var responseSkills = await http.GetAsync("https://localhost:7237/api/skills");
 			var responseAdmins = await http.GetAsync("https://localhost:7237/api/admins");
 			var responseProjects = await http.GetAsync("https://localhost:7237/api/projects");
@@ -186,6 +215,16 @@
 			if (responseAdmins.IsSuccessStatusCode)
 			{
 				admins = await responseAdmins.Content.ReadFromJsonAsync<List<Admin>>();
+
+				foreach (Admin admin in admins)
+				{
+					if (admin.Name == user.Identity.Name)
+					{
+						registeredAdmin = admin;
+
+						break;
+					}
+				}
 
 			}
 			else
@@ -209,9 +248,9 @@
 		}
 	}
 
-	private async Task SubmitBtn()
+	private async Task AddNewSkill()
 	{
-		var newSkill = new Skill { Name = title, Description = description, Time = time };
+		var newSkill = new Skill { Name = skillTitle, Description = skillDescription, Time = skillTime };
 
 		HttpClient http = HttpClientFactory.CreateClient();
 
@@ -219,15 +258,26 @@
 		using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
 		await http.PostAsync("https://localhost:7237/api/skill", content);
+
+		skillTitle = string.Empty;
+		skillDescription = string.Empty;
+		skillTime = string.Empty;
+		skillExperienceLevel = string.Empty;
 	}
 
-	private async Task AddNewSkill()
+	private async Task AddNewProject()
 	{
+		var newProject = new Project { Name = projectTitle, Description = projectDescription, Link = projectLink };
 
-	}
+		HttpClient http = HttpClientFactory.CreateClient();
 
-	private void ToggleAdminView()
-	{
-		ToggleNavMenu = !ToggleNavMenu;
+		var json = JsonSerializer.Serialize(newProject);
+		using var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+		await http.PostAsync("https://localhost:7237/api/project", content);
+
+		projectTitle = string.Empty;
+		projectDescription = string.Empty;
+		projectLink = string.Empty;
 	}
 }

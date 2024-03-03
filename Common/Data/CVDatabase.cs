@@ -17,7 +17,7 @@ namespace Common.Data
 
 		public CVDatabase(string database)
 		{
-			 var client = new MongoClient(connectionstring);
+			var client = new MongoClient(connectionstring);
 
 			db = client.GetDatabase(database);
 		}
