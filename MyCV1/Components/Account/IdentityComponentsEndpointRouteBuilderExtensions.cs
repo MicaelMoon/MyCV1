@@ -10,7 +10,7 @@ using MyCV1.Components.Account.Pages;
 using MyCV1.Components.Account.Pages.Manage;
 using MyCV1.Data;
 
-namespace Microsoft.AspNetCore.Routing
+namespace MyCV1.Components.Account
 {
 	internal static class IdentityComponentsEndpointRouteBuilderExtensions
 	{
