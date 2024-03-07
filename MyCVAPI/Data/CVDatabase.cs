@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Common.Models;
 using MongoDB.Driver;
 
-namespace Common.Data
+namespace MyCVAPI.Data
 {
 	public class CVDatabase
 	{
