@@ -13,7 +13,7 @@ namespace MyCVAPI.Data
 	{
 		private IMongoDatabase db;
 
-		private string connectionstring = Environment.GetEnvironmentVariable("MicaelCVMongoDB");
+		private string connectionstring = Environment.GetEnvironmentVariable("MicaelCVMongoDB",EnvironmentVariableTarget.Process);
 
 		public CVDatabase(string database)
 		{

@@ -37,7 +37,7 @@ namespace MyCV1
 
 			//var connectionString = builder.Configuration.GetConnectionString(Environment.GetEnvironmentVariable("IdentitySqlString")) ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 			builder.Services.AddDbContext<ApplicationDbContext>(options =>
-				options.UseSqlServer(Environment.GetEnvironmentVariable("IdentitySqlString")));
+				options.UseSqlServer(Environment.GetEnvironmentVariable("IdentitySqlString2")));
 			//builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 			builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
