@@ -184,9 +184,9 @@
 			var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
 			user = authState.User;
 
-			var responseSkills = await http.GetAsync("https://localhost:7237/api/skills");
-			var responseAdmins = await http.GetAsync("https://localhost:7237/api/admins");
-			var responseProjects = await http.GetAsync("https://localhost:7237/api/projects");
+			var responseSkills = await http.GetAsync("https://micaelcvapi.azurewebsites.net/api/skills");
+			var responseAdmins = await http.GetAsync("https://micaelcvapi.azurewebsites.net/api/admins");
+			var responseProjects = await http.GetAsync("https://micaelcvapi.azurewebsites.net/api/projects");
 
 			if (responseSkills.IsSuccessStatusCode)
 			{
@@ -240,7 +240,7 @@
 		var json = JsonSerializer.Serialize(newSkill);
 		using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-		await http.PostAsync("https://localhost:7237/api/skill", content);
+		await http.PostAsync("https://micaelcvapi.azurewebsites.net/api/skill", content);
 
 		skills.Add(newSkill);
 
@@ -254,7 +254,7 @@
 		var json = JsonSerializer.Serialize(newProject);
 		using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-		await http.PostAsync("https://localhost:7237/api/project", content);
+		await http.PostAsync("https://micaelcvapi.azurewebsites.net/api/project", content);
 
 		projects.Add(newProject);
 

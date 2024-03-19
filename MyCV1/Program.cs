@@ -35,7 +35,8 @@ namespace MyCV1
 				})
 				.AddIdentityCookies();
 
-			var connectionString = Environment.GetEnvironmentVariable("IdentitySqlString") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+			var connectionString = builder.Configuration.GetConnectionString("IdentitySqlString") ?? throw new InvalidOperationException("Connection string not found.");
+			//var connectionString = Environment.GetEnvironmentVariable("IdentitySqlString",EnvironmentVariableTarget.Machine) ?? throw new InvalidOperationException("Connection string not found.");
 			builder.Services.AddDbContext<ApplicationDbContext>(options =>
 				options.UseSqlServer(connectionString));
 			//builder.Services.AddDatabaseDeveloperPageExceptionFilter();

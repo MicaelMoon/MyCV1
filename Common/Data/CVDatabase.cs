@@ -13,9 +13,9 @@ namespace Common.Data
 	{
 		private IMongoDatabase db;
 
-		private string connectionstring = Environment.GetEnvironmentVariable("MicaelCVMongoDB",EnvironmentVariableTarget.Process);
+		//private string connectionstring = Environment.GetEnvironmentVariable("MicaelCVMongoDB",EnvironmentVariableTarget.Machine);
 
-		public CVDatabase(string database)
+		public CVDatabase(string database, string connectionstring)
 		{
 			var client = new MongoClient(connectionstring);
 
